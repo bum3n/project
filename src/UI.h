@@ -33,6 +33,9 @@ public:
     // Set the processed result for preview
     void setProcessedImage(const ImageBuffer& img);
 
+    // Get the processed image (for saving)
+    const ImageBuffer& getProcessedImage() const { return m_processedImage; }
+
     // Check if we need to reprocess
     bool needsReprocess() const { return m_needsReprocess; }
     void clearReprocessFlag() { m_needsReprocess = false; }
