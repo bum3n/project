@@ -1,4 +1,4 @@
-# Зыбучий шакал
+# Шакальность (Shakalnost)
 
 Desktop meme editor for intentional image degradation. Make your memes cursed with full control over artifacts.
 
@@ -39,7 +39,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
 
-Output: `build/Release/ZybuchiyJackal.exe`
+Output: `build/Release/Shakalnost.exe`
 
 ### Build with GCC/Clang (Linux)
 
@@ -48,7 +48,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-Output: `build/ZybuchiyJackal`
+Output: `build/Shakalnost`
 
 ### Automated builds
 
