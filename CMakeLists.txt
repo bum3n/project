@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project("Зыбучий шакал" LANGUAGES CXX)
+project("Шакальность" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -54,31 +54,31 @@ set(APP_SOURCES
 )
 
 if(WIN32)
-    add_executable(ZybuchiyJackal WIN32 ${APP_SOURCES})
+    add_executable(Shakalnost WIN32 ${APP_SOURCES})
 else()
-    add_executable(ZybuchiyJackal ${APP_SOURCES})
+    add_executable(Shakalnost ${APP_SOURCES})
 endif()
 
-target_include_directories(ZybuchiyJackal PRIVATE
+target_include_directories(Shakalnost PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/third_party/stb
 )
 
-target_link_libraries(ZybuchiyJackal PRIVATE imgui_lib glfw)
+target_link_libraries(Shakalnost PRIVATE imgui_lib glfw)
 
 if(WIN32)
-    target_link_libraries(ZybuchiyJackal PRIVATE opengl32 gdi32 shell32 comdlg32)
+    target_link_libraries(Shakalnost PRIVATE opengl32 gdi32 shell32 comdlg32)
 elseif(UNIX)
-    target_link_libraries(ZybuchiyJackal PRIVATE GL X11 pthread dl)
+    target_link_libraries(Shakalnost PRIVATE GL X11 pthread dl)
 endif()
 
 # Compiler flags
 if(MSVC)
-    target_compile_options(ZybuchiyJackal PRIVATE /utf-8)
-    target_compile_options(ZybuchiyJackal PRIVATE $<$<CONFIG:Release>:/O2>)
+    target_compile_options(Shakalnost PRIVATE /utf-8)
+    target_compile_options(Shakalnost PRIVATE $<$<CONFIG:Release>:/O2>)
     target_compile_options(imgui_lib PRIVATE /utf-8)
     target_compile_options(imgui_lib PRIVATE $<$<CONFIG:Release>:/O2>)
 else()
-    target_compile_options(ZybuchiyJackal PRIVATE $<$<CONFIG:Release>:-O2>)
+    target_compile_options(Shakalnost PRIVATE $<$<CONFIG:Release>:-O2>)
     target_compile_options(imgui_lib PRIVATE $<$<CONFIG:Release>:-O2>)
 endif()

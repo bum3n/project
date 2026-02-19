@@ -141,8 +141,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
     GLFWwindow* window = glfwCreateWindow(
         1280, 800,
-        "\xd0\x97\xd1\x8b\xd0\xb1\xd1\x83\xd1\x87\xd0\xb8\xd0\xb9"
-        " \xd1\x88\xd0\xb0\xd0\xba\xd0\xb0\xd0\xbb"
+        "\xd0\xa8\xd0\xb0\xd0\xba\xd0\xb0\xd0\xbb\xd1\x8c\xd0\xbd\xd0\xbe\xd1\x81\xd1\x82\xd1\x8c"
         " - "
         "\xd0\x9c\xd0\xb5\xd0\xbc-\xd1\x80\xd0\xb5\xd0\xb4\xd0\xb0\xd0\xba\xd1\x82\xd0\xbe\xd1\x80",
         nullptr, nullptr);
@@ -181,7 +180,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
     // Load persisted settings
     std::string exeDir = getExeDirectory();
-    std::string iniPath = exeDir + "/zyb_settings.ini";
+    std::string iniPath = exeDir + "/shakalnost_settings.ini";
     ui.loadSettings(iniPath.c_str());
 
     // ------------------------------------------------------------------
