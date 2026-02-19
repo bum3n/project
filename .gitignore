@@ -19,3 +19,4 @@ CMakeFiles/
 Makefile
 *.ini
 imgui.ini
+_codeql_detected_source_root

@@ -46,19 +46,16 @@ void UI::init() {
 bool UI::render() {
     m_settingsChanged = false;
 
-    // Full-window dockspace
+    // Menu bar in a full-width host window
     ImGuiViewport* vp = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(vp->WorkPos);
-    ImGui::SetNextWindowSize(vp->WorkSize);
+    ImGui::SetNextWindowSize(ImVec2(vp->WorkSize.x, 0));
     ImGuiWindowFlags hostFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
                                  ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoMove |
                                  ImGuiWindowFlags_NoBringToFrontOnFocus |
-                                 ImGuiWindowFlags_NoNavFocus  | ImGuiWindowFlags_MenuBar;
-    ImGui::Begin("##DockHost", nullptr, hostFlags);
-
-    ImGuiID dockId = ImGui::GetID("MainDockSpace");
-    ImGui::DockSpace(dockId, ImVec2(0, 0));
-
+                                 ImGuiWindowFlags_NoNavFocus  | ImGuiWindowFlags_MenuBar |
+                                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar;
+    ImGui::Begin("##MenuHost", nullptr, hostFlags);
     renderMenuBar();
     ImGui::End();
 
