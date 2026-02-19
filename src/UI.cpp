@@ -708,13 +708,9 @@ std::string UI::showSaveDialog() {
 // ---------------------------------------------------------------------------
 
 void UI::randomizeSettings() {
-    std::mt19937 rng;
-    if (m_settings.randomSeed != 0) {
-        rng.seed(static_cast<unsigned>(m_settings.randomSeed));
-    } else {
-        std::random_device rd;
-        rng.seed(rd());
-    }
+    std::mt19937 rng(m_settings.randomSeed != 0
+        ? static_cast<unsigned>(m_settings.randomSeed)
+        : std::random_device{}());
 
     auto randInt = [&](int lo, int hi) {
         return std::uniform_int_distribution<int>(lo, hi)(rng);
