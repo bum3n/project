@@ -1,0 +1,177 @@
+// Prisma schema for iWa Messenger
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  username       String    @unique
+  email          String    @unique
+  passwordHash   String
+  displayName    String
+  avatarUrl      String?
+  bio            String?
+  isOnline       Boolean   @default(false)
+  lastSeenAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  refreshTokens  RefreshToken[]
+  chatMembers    ChatMember[]
+  sentMessages   Message[]       @relation("SentMessages")
+  messageReads   MessageRead[]
+  notifications  Notification[]  @relation("NotificationRecipient")
+  triggeredNotifications Notification[] @relation("NotificationTriggerer")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  userId     String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Chat {
+  id          String     @id @default(uuid())
+  type        ChatType   @default(PRIVATE)
+  name        String?    // null for private chats
+  description String?
+  avatarUrl   String?
+  createdBy   String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  members     ChatMember[]
+  messages    Message[]
+  notifications Notification[]
+
+  @@map("chats")
+}
+
+enum ChatType {
+  PRIVATE
+  GROUP
+}
+
+model ChatMember {
+  id         String    @id @default(uuid())
+  chatId     String
+  userId     String
+  role       MemberRole @default(MEMBER)
+  joinedAt   DateTime  @default(now())
+  lastReadAt DateTime  @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@map("chat_members")
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Message {
+  id          String      @id @default(uuid())
+  chatId      String
+  senderId    String
+  content     String?
+  type        MessageType @default(TEXT)
+  replyToId   String?     // for reply threading
+  isEdited    Boolean     @default(false)
+  isDeleted   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  chat        Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender      User        @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo     Message?    @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies     Message[]   @relation("MessageReplies")
+  readBy      MessageRead[]
+  attachments Attachment[]
+
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  AUDIO
+  VIDEO
+  SYSTEM
+}
+
+model MessageRead {
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_reads")
+}
+
+model Attachment {
+  id           String @id @default(uuid())
+  messageId    String
+  filename     String  // original filename
+  storedName   String  // UUID-based filename on disk
+  mimeType     String
+  size         Int
+  url          String
+  createdAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String           // recipient
+  triggeredBy String?          // who triggered it
+  type        NotificationType
+  title       String
+  body        String
+  chatId      String?
+  messageId   String?
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  user        User  @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  triggerer   User? @relation("NotificationTriggerer", fields: [triggeredBy], references: [id], onDelete: SetNull)
+  chat        Chat? @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  MENTION
+  GROUP_INVITE
+  SYSTEM
+}
