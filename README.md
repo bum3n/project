@@ -1,82 +1,140 @@
-# Шакальность (Shakalnost)
+# iWa Messenger
 
-Desktop meme editor for intentional image degradation. Make your memes cursed with full control over artifacts.
+A production-structured real-time messenger application inspired by Telegram. Built with Node.js (Express), React (Vite), PostgreSQL (Prisma ORM), and Socket.io.
 
-## Features
+> This repository also contains **Шакальность (Shakalnost)** — see [below](#shakalnost-desktop-meme-editor).
 
-- **Color quantization** — reduce color depth (0–100) with optional dithering (ordered / Floyd-Steinberg)
-- **Sharpen** — over-sharpen to taste (0–100)
-- **Resolution** — downscale and re-upscale (1–100 %) with nearest-neighbor (HD8K toggle) or bilinear filtering
-- **Displacement** — warp pixels with a GPU-accelerated shader (CPU fallback available)
-- **JPEG compression** — simulate recompression artifacts (quality 0–100, configurable iteration count)
-- **Noise** — Gaussian, salt-and-pepper, or digital banding (0–100, optional per-channel)
-- **RGB shift** — offset color channels horizontally and/or vertically (0–100)
-- **Glitch** — random horizontal band shifts with configurable band count, amplitude, and seed
-- **Palette presets** — GameBoy, NES, Windows 98, Thermal, Mono Green, or a custom palette
-- **Iterative destroy** — re-apply the entire pipeline N times for exponential degradation
-- **Watermark** — burn custom text into the image
-- Real-time preview with before/after split-view comparison
-- Drag-and-drop and clipboard paste support (Ctrl+V, Windows)
-- GPU-accelerated displacement shader with automatic CPU fallback
-- Undo/redo (up to 10 steps)
-- Auto-save settings on exit, auto-load on startup
-- Export to PNG, JPEG, BMP with optional EXIF stripping
-- Fully offline — no servers, no network access needed
+---
 
-## Building
+## Project Structure
+
+```
+/
+├── client/          React + Vite + Tailwind CSS frontend
+├── server/          Node.js + Express + Socket.io backend
+├── database/        Prisma schema reference copy
+├── docs/            API documentation
+├── src/             Shakalnost C++ source
+└── CMakeLists.txt   Shakalnost build
+```
+
+---
+
+## iWa Messenger
+
+### Features
+
+- 🔐 JWT authentication (access + refresh tokens, rotation, replay protection)
+- 👤 User profiles (avatar, bio, username, online/offline status)
+- 💬 Private 1-to-1 chats (auto-created on first message)
+- 👥 Group chats (create, manage members)
+- ⚡ Real-time messaging via Socket.io
+- 📜 Persistent message history in PostgreSQL
+- ✅ Read / unread message status & delivery receipts
+- 🔍 Search users and chats
+- 📎 File & image attachments (local storage, cloud-ready)
+- 🟢 Online / offline presence
+- 🔔 In-app notifications
+- 😊 Emoji support
+
+### Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript, Vite, Tailwind CSS, Zustand |
+| Backend | Node.js, Express, TypeScript |
+| Real-time | Socket.io |
+| Database | PostgreSQL + Prisma ORM |
+| Auth | JWT (jsonwebtoken) + bcryptjs |
+| File uploads | Multer (local storage) |
+| Validation | Zod |
 
 ### Prerequisites
 
-- CMake 3.20+
-- C++20 compiler (MSVC 2022, GCC 11+, Clang 13+)
-- OpenGL 3.3+ capable GPU (or CPU fallback)
-- On Linux: `sudo apt install libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev`
+- Node.js 18+
+- PostgreSQL 14+
+- npm or pnpm
 
-### Build with MSVC (Windows)
+### Setup
+
+#### 1. Install dependencies
+
+```bash
+cd server && npm install
+cd ../client && npm install
+```
+
+#### 2. Configure environment
+
+```bash
+cd server
+cp .env.example .env
+# Edit .env — set DATABASE_URL and JWT secrets
+```
+
+#### 3. Set up the database
+
+```bash
+cd server
+npx prisma migrate dev --name init
+npx prisma db seed   # Optional: seed demo accounts
+```
+
+Demo accounts after seeding (password: `Demo1234!`):
+- `alice@iwa.app`
+- `bob@iwa.app`
+- `carol@iwa.app`
+
+#### 4. Run
+
+```bash
+# Terminal 1 — backend (http://localhost:3000)
+cd server && npm run dev
+
+# Terminal 2 — frontend (http://localhost:5173)
+cd client && npm run dev
+```
+
+### API Documentation
+
+See [`docs/API.md`](docs/API.md) for the complete REST + WebSocket API reference.
+
+### Architecture
 
 ```
+server/src/
+  routes/        Express routers per resource
+  controllers/   HTTP request handlers
+  services/      Business logic layer
+  middleware/    Auth guard, error handler, file upload
+  socket/        Socket.io real-time hub
+  utils/         JWT helpers, password hashing, storage
+  config/        Prisma client, JWT config
+
+client/src/
+  api/           Axios modules (auth, users, chats, messages)
+  socket/        Socket.io singleton
+  store/         Zustand global state (auth, chats, notifications)
+  hooks/         useSocket, useAuth, useChat
+  components/    UI components (chat, layout, auth, notifications)
+  pages/         LoginPage, RegisterPage, MainPage, ProfilePage
+```
+
+---
+
+## Shakalnost Desktop Meme Editor
+
+Desktop meme editor for intentional image degradation. Make your memes cursed.
+
+### Building
+
+```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
+cmake --build build --config Release   # Windows: build/Release/Shakalnost.exe
+cmake --build build                    # Linux: build/Shakalnost
 ```
 
-Output: `build/Release/Shakalnost.exe`
-
-### Build with GCC/Clang (Linux)
-
-```
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-```
-
-Output: `build/Shakalnost`
-
-### Automated builds
-
-The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) that automatically builds the executable on every push and creates GitHub Releases when a version tag (`v*`) is pushed.
-
-## Controls
-
-| Shortcut | Action |
-|---|---|
-| **Ctrl+O** | Open image file |
-| **Ctrl+S** | Save processed image |
-| **Ctrl+V** | Paste image from clipboard (Windows) |
-| **Ctrl+Z** | Undo |
-| **Ctrl+Y** / **Ctrl+Shift+Z** | Redo |
-| **Drag & drop** | Load an image by dropping it onto the window |
-| **Sliders** | Adjust each effect parameter in the control panel |
-| **Randomize** | Randomize all settings |
-| **Reset** | Reset all settings to defaults |
-
-## Architecture
-
-| File | Purpose |
-|---|---|
-| `src/main.cpp` | Entry point, GLFW/OpenGL/ImGui initialization, main loop |
-| `src/UI.h` / `src/UI.cpp` | Dear ImGui interface, control panel, preview, file dialogs |
-| `src/ImageProcessor.h` / `src/ImageProcessor.cpp` | CPU image processing algorithms |
-| `src/ShaderManager.h` / `src/ShaderManager.cpp` | OpenGL shader management (displacement) |
-| `src/Pipeline.h` / `src/Pipeline.cpp` | Async processing pipeline with undo/redo history |
+Linux prerequisites: `sudo apt install libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev`
 
 ## License
 
