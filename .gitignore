@@ -21,3 +21,9 @@ Makefile
 imgui.ini
 _codeql_detected_source_root
 _codeql_build_dir/
+
+# iWa Messenger — Node.js / React artifacts
+node_modules/
+dist/
+.env
+server/uploads/
